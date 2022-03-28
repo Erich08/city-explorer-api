@@ -11,9 +11,42 @@ const axios = require('axios');
 
 app.use(cors());
 
+const months = [
+  '',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+// Credit to JJ for this formating function
+const formatDate = (date) => {
+  const dateArr = date.split('-');
+  const year = dateArr[0];
+  const month = findMonth(dateArr[1]);
+  const day = dateArr[2];
+  return `${month} ${day}, ${year}`;
+};
+
+const findMonth = (month) => {
+  for (let i = 0; i < months.length + 1; i++) {
+    if (i == month) {
+      return months[i];
+    }
+  }
+};
+
 class Forecast {
   constructor(day) {
-    this.date = day.datetime;
+    this.date = formatDate(day.datetime);
     this.description = day.weather.description;
     this.lat = day.lat;
     this.lon = day.lon;
