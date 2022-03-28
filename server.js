@@ -22,7 +22,7 @@ class Forecast {
 
 app.get('/weather', async (request, response) => {
   const searchQuery = request.query.searchQuery;
-  const url = `${process.env.WEATHER_API}?city=${searchQuery}&lat=${this.lat}&lon=${this.lon}&key=${process.env.WEATHER_API_KEY}`;
+  const url = `${process.env.WEATHER_API}?city=${searchQuery}&lat=${this.lat}&lon=${this.lon}&days=7&key=${process.env.WEATHER_API_KEY}`;
   try {
     const weather = await axios.get(url);
     const forecast = weather.data.data.map((day) => new Forecast(day));
