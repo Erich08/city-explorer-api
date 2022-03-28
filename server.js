@@ -4,29 +4,29 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const weatherData = require('./data/weather.json');
+// const weatherData = require('./data/weather.json');
 const app = express();
 const PORT = process.env.PORT || 3002;
+const axios = require('axios');
 
 app.use(cors());
 
 class Forecast {
-  constructor(date, description) {
-    this.date = date;
-    this.description = description;
+  constructor(day) {
+    this.date = day.datetime;
+    this.description = day.weather.description;
+    this.lat = day.lat;
+    this.lon = day.lon;
   }
 }
 
-app.get('/weather', (request, response) => {
+app.get('/weather', async (request, response) => {
   const searchQuery = request.query.searchQuery;
-  const city = weatherData.find(
-    (cityObj) => cityObj.city_name.toLowerCase() === searchQuery.toLowerCase()
-  );
+  const url = `${process.env.WEATHER_API}?city=${searchQuery}&lat=${this.lat}&lon=${this.lon}&key=${process.env.WEATHER_API_KEY}`;
   try {
-    const forecast = city.data.map(
-      (day) => new Forecast(day.valid_date, day.weather.description)
-    );
-    response.send(forecast);
+    const weather = await axios.get(url);
+    const forecast = weather.data.data.map((day) => new Forecast(day));
+    response.status(200).send(forecast);
   } catch (error) {
     response.send(error.message);
   }
