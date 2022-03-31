@@ -11,8 +11,8 @@ const getMovies = require('./modules/movie_data');
 
 app.use(cors());
 
-app.get('/weather', getWeather);
-
 app.get('/movies', getMovies);
+
+app.get('/weather', getWeather);
 
 app.listen(PORT, () => console.log(`Listening on PORT: ${PORT}`));

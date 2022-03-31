@@ -2,6 +2,7 @@
 
 const axios = require('axios');
 const formatDate = require('./format_date');
+const cache = require('./cache');
 
 class Forecast {
   constructor(day) {
@@ -17,12 +18,28 @@ class Forecast {
 }
 
 async function getWeather(request, response) {
-  const searchQuery = request.query.searchQuery;
-  const url = `${process.env.WEATHER_API}?city=${searchQuery}&days=7&units=i&key=${process.env.WEATHER_API_KEY}`;
   try {
-    const weather = await axios.get(url);
-    const forecast = weather.data.data.map((day) => new Forecast(day));
-    response.status(200).send(forecast);
+    const searchQuery = request.query.searchQuery;
+    const lat = request.query.lat;
+    const lon = request.query.lon;
+    const key = `${lat}${lon}`;
+    const url = `${process.env.WEATHER_API}?city=${searchQuery}&days=7&units=i&key=${process.env.WEATHER_API_KEY}`;
+    if (cache[key] && Date.now() - cache[key].timeStamp < 50000) {
+      console.log('Weather cache hit');
+      response.send(cache[key].weatherCache);
+    } else {
+      const weather = await axios.get(url);
+      if (weather) {
+        const forecast = weather.data.data.map((day) => new Forecast(day));
+        console.log('Weather cache miss');
+        cache[key] = {
+          weatherCache: forecast,
+          timeStamp: Date.now(),
+        };
+        response.status(200).send(forecast);
+        response.send(timeStamp);
+      }
+    }
   } catch (error) {
     response.send(error.message);
   }
