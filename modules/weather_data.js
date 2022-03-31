@@ -37,7 +37,6 @@ async function getWeather(request, response) {
           timeStamp: Date.now(),
         };
         response.status(200).send(forecast);
-        response.send(timeStamp);
       }
     }
   } catch (error) {
